@@ -1,5 +1,7 @@
+import 'package:api_practicing/HomeScreen.dart';
 import 'package:flutter/material.dart';
-import 'Home_Screen.dart';
+
+import 'Screen_without_model.dart';
 
 
 void main() {
@@ -19,7 +21,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         useMaterial3: false
       ),
-      home: HomeScreen(),
+      home:ScreenWithoutModel(),
     );
   }
 }
