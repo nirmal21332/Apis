@@ -32,16 +32,22 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: Column(
         children: [
-          FutureBuilder(future:getPostApi(), builder: (context,snapshot) {
-            return ListView.builder(itemCount: postModel.length,itemBuilder:(context,index){
-              Card(
-                child: ListTile(
-                title: Text(snapshot.data![index].title.toString()),
-                subtitle:Text(snapshot.data![index].body.toString()) ,
-                ),
-              );
-            });
-    },)
+          Expanded(
+            child: FutureBuilder(future:getPostApi(), builder: (context,snapshot) {
+              if(!snapshot.hasData){
+                return Center(child: CircularProgressIndicator());
+              }else{
+                return ListView.builder(itemCount: postModel.length,itemBuilder:(context,index){
+                  Card(
+                    child: ListTile(
+                      title: Text(snapshot.data![index].title.toString()),
+                      subtitle:Text(snapshot.data![index].body.toString()) ,
+                    ),
+                  );
+                });
+              }
+                },),
+          )
         ],
       ),
     );
