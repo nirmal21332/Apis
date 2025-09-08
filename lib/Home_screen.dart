@@ -1,70 +1,100 @@
 import 'dart:convert';
 
-import 'package:api_practicing/ApiModel.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-Future<ApiModel> getProductsAPi() async {
-  final response = await http.get(
-    Uri.parse('https://webhook.site/08c44fae-4eff-4d3e-bc19-ac2ea7a4e32b'),
-  );
-  var data = jsonDecode(response.body.toString());
-  if (response.statusCode == 200) {
-    return ApiModel.fromJson(data);
-  } else {
-    return ApiModel.fromJson(data);
+class _HomeScreenState extends State<HomeScreen> {
+  TextEditingController _userNameController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  void login(String userName,password)async{
+    try{
+      Response response=await post(
+        Uri.parse('https://restful-booker.herokuapp.com/auth'),
+        body: {
+          "username" : userName,
+          "password" : password,
+        }
+      );
+
+      if(response.statusCode==200){
+        var data=jsonDecode(response.body.toString());
+        print(data);
+        print('Login Successful');
+      }else{
+        print('Try Again');
+      }
+
+    }catch(e){
+      print(e.toString());
+    }
+
   }
-}
 
-class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Products Api')),
-      body: Column(
-        children: [
-          Expanded(
-            child: FutureBuilder<ApiModel>(
-              future: getProductsAPi(),
-              builder: (context, snapshot) {
-                if(snapshot.hasData){
-                  return ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: snapshot.data!.data!.length,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        height:MediaQuery.of(context).size.height*0.3,
-                        width:MediaQuery.of(context).size.width*0.3,
-                        child: ListView.builder(
-                            itemCount: snapshot.data!.data![index].images!.length,
-                            itemBuilder:(context,value){
-                          return Container(
-                            height:MediaQuery.of(context).size.height*0.25,
-                            width:MediaQuery.of(context).size.width*0.25,
-                            decoration: BoxDecoration(
-                              image:DecorationImage(
-                                  image:NetworkImage(snapshot.data!.data![index].images![value].url.toString())
-                              )
-                            ),
-                          );
-                        }),
-                      );
-                    },
-                  );
-                }else{
-                 return Center(child: CircularProgressIndicator());
-                }
-              },
+      appBar: AppBar(title: Text('Post Api'), centerTitle: true),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 40),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextFormField(
+              controller: _userNameController,
+              decoration: InputDecoration(
+                hintText: 'Username',
+                filled: true,
+                fillColor: Colors.grey[300],
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
-          ),
-        ],
+            SizedBox(height: 10),
+            TextFormField(
+              controller: _passwordController,
+              decoration: InputDecoration(
+                hintText: 'Password',
+                filled: true,
+                fillColor: Colors.grey[300],
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+
+            SizedBox(height: 25),
+
+            GestureDetector(
+              onTap:(){
+
+                login(_userNameController.text.toString(),_passwordController.text.toString());
+
+              },
+              child: Container(
+                  height: 50,
+                    width: 300,
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(12)
+                    ),
+                    child: Center(child: Text('Sign Up',style: TextStyle(fontWeight: FontWeight.bold),))
+                ),
+            ),
+
+          ],
+        ),
       ),
     );
   }
